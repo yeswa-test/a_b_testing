@@ -27,19 +27,19 @@ export class UserVariantModel extends BaseMongooseModel{
         return BaseMongooseModel.find().lean();
     }
 
-    static async getUserVariantFor(userId:string){
+    static async getUserVariantFor(userId:string):Promise<IUserVariant[]>{
         return BaseMongooseModel.find({userId:userId}).lean();
     }
 
-    static async getUserVariantArrayByTestId(testId:string){
+    static async getUserVariantArrayByTestId(testId:string):Promise<IUserVariant[]>{
         return BaseMongooseModel.find({testId:testId}).lean();
     }
 
-    static async getUserVariant(userId,testId){
+    static async getUserVariant(userId:string,testId:string){
         return BaseMongooseModel.findOne({userId:userId,testId:testId}).lean();
     }
 
-    static async getUserVariantUsingVariantId(userId,testId,variantId){
+    static async getUserVariantUsingVariantId(userId:string,testId:string,variantId:string):Promise<IUserVariant|null>{
         return BaseMongooseModel.findOne({userId:userId,testId:testId,variantId:variantId}).lean();
     }
 }
@@ -48,7 +48,9 @@ export interface IUserVariant{
     testId:string,
     userId:string
     variantId:string,
-    assignedAt?:Date
+    createdAt?: Date;
+    updatedAt?: Date;
+    assignedAt?: Date;
 }
 
 export interface ITestVariantCount{

@@ -1,6 +1,6 @@
-import { ITest, ITestVariant, TestModel } from "../model/test_model";
-import { IUser, UserModel } from "../model/user_model";
-import { ITestVariantCount, IUserVariant, UserVariantModel } from "../model/user_variant_model";
+import {ITest, ITestVariant, TestModel} from "../model/test_model";
+import {IUser} from "../model/user_model";
+import {ITestVariantCount, IUserVariant, UserVariantModel} from "../model/user_variant_model";
 
 export class UserVariantService extends UserVariantModel {
 
@@ -33,7 +33,7 @@ export class UserVariantService extends UserVariantModel {
     static async getMininumTestVariant(testUnit: ITest) {
 
         try {
-            let minVariant: ITestVariant;
+            let minVariant: ITestVariant = testUnit.variantArray[0];
             let testVariantArray: ITestVariant[] = testUnit.variantArray;
             let testVariantCountArray: ITestVariantCount[] = await UserVariantService.getUserCountForUserVariant(testUnit);
 
@@ -58,14 +58,18 @@ export class UserVariantService extends UserVariantModel {
                 }
             }
 
-            return minVariant
+            return minVariant;
         } catch (e) {
             console.log(`Error in getMininumTestVariant : ${e}`)
         }
     }
 
     static async getNewVariantToUser(testUnit: ITest, user: IUser) {
-        let testVariant: ITestVariant = await UserVariantService.getMininumTestVariant(testUnit)
+        const testVariant = await UserVariantService.getMininumTestVariant(testUnit)
+        if (!testVariant) {
+            console.log(`Test variant is not available.`);
+            return null;
+        }
         let newUserVariant: IUserVariant = {
             userId: user.userId,
             testId: testUnit.testId,
@@ -81,7 +85,7 @@ export class UserVariantService extends UserVariantModel {
         for (const testUnit of testUnitArray) {
             for (const userVariant of userVariantArray) {
                 if (userVariant.testId == testUnit.testId) {
-                    continue;
+
                 } else {
                     UserVariantService.getNewVariantToUser(testUnit, user);
                 }
@@ -89,22 +93,23 @@ export class UserVariantService extends UserVariantModel {
         }
     }
 
-    static async createUserVariant(test:ITest, variantId: string, user:IUser): Promise<IUserVariant | null> {
+    static async createUserVariant(test: ITest, variantId: string, user: IUser): Promise<IUserVariant> {
         let newUserVariant: IUserVariant = {
             userId: user.userId,
             testId: test.testId,
-            variantId: variantId
+            variantId: variantId,
+            assignedAt: new Date(),
+            createdAt: new Date(),
+            updatedAt: new Date()
         };
-        
         await this.addOrUpdateUserVariant(newUserVariant, newUserVariant);
         return newUserVariant;
     }
-    
-    static async checkAndGetTheUserVariant(user: IUser, test: ITest, variantId: string): Promise<IUserVariant | null> {
-        let userVariant: IUserVariant = await UserVariantModel.getUserVariantUsingVariantId(user.userId, test.testId, variantId);
-        if (!userVariant) {
-            userVariant = await this.createUserVariant(test, variantId, user);
-        }
+
+    static async checkAndGetTheUserVariant(user: IUser, test: ITest, variantId: string): Promise<IUserVariant> {
+        let alreadyUserVariant = await UserVariantModel.getUserVariantUsingVariantId(user.userId, test.testId, variantId);
+        if (alreadyUserVariant) return alreadyUserVariant;
+        let userVariant = await UserVariantService.createUserVariant(test, variantId, user);
         return userVariant;
     }
 }

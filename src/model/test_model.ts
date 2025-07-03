@@ -12,7 +12,7 @@ let Schema = mongoose.Schema;
 let dataSchema = new Schema({
     testId: String,   // should be represented in enum afterwards..
     name: String,
-    screenId:String,
+    screenId: String,
     description: String,
     rollOutPercentage: {
         type: Number,
@@ -33,46 +33,39 @@ let dataSchema = new Schema({
         type: Date,
         default: Date.now
     }
-}, { collection: "test", _id: true, versionKey: false, timestamps: true })
+}, {collection: "test", _id: true, versionKey: false, timestamps: true})
 
 
 const BaseMongooseModel = mongoose.model('Test', dataSchema);
 
 export class TestModel extends BaseMongooseModel {
     static async addOrUpdateTestModel(test: ITest, updateObject: ITest) {
-        return BaseMongooseModel.findOneAndUpdate({ testId: test.testId }, updateObject, {
+        return BaseMongooseModel.findOneAndUpdate({testId: test.testId}, updateObject, {
             upsert: true,
             new: true,
             setDefaultsOnInsert: true
         }).lean();
     }
 
-    static async getAllTest() {
+    static async getAllTest(): Promise<ITest[]> {
         return BaseMongooseModel.find().lean();
     }
 
-    static async getAllTestForScreen(screenId:string){
-        return BaseMongooseModel.find({screenId:screenId}).lean();
+    static async getAllTestForScreen(screenId: string): Promise<ITest[]> {
+        return BaseMongooseModel.find({screenId: screenId}).lean();
     }
 
-    static async getTestFor(testId:string){
-        return BaseMongooseModel.find({testId:testId}).lean();
+    static async getTestFor(testId: string): Promise<ITest|null> {
+        return BaseMongooseModel.findOne({testId: testId}).lean();
     }
 
-    static async getTestVariant(testId:string,variantId:string){
-        let test:ITest = await this.getTestFor(testId);
-        for(let variant of test.variantArray){
-            if(variantId == variant.variantId){
-                return variant;
-            }
-        }
-    }
+
 }
 
 export interface ITest {
     testId: string,
     name: string,
-    screenId:string,
+    screenId: string,
     description: string,
     rollOutPercentage: number,
     startDate: Date,

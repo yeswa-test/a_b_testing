@@ -7,23 +7,23 @@ let dataSchema = new Schema({
     userId: String,
     testId: String,
     variantId: String,
-    variantName: String,
     assignedAt: Date,
     eventTimeStamp: {
         type: Date,
         default: Date.now,
     }
-}, { collection: "event_log", timestamps: true });
+}, {collection: "event_log", timestamps: true});
 
 const BaseMongooseModel = mongoose.model('EventLog', dataSchema);
 
 export class EventLogModel extends BaseMongooseModel {
-    
+
     static async addLogInDB(eventLog: IEventLog) {
-        return BaseMongooseModel.create({ eventLog });
+        console.log(`inside add event log :`, eventLog)
+        return BaseMongooseModel.create(eventLog);
     }
 
-    static async getAllLogs() {
+    static async getAllLogs(): Promise<IEventLog[]> {
         return BaseMongooseModel.find().lean();
     }
 }
@@ -33,7 +33,6 @@ export interface IEventLog {
     userId: string,
     testId: string,
     variantId: string,
-    variantName: string,
     assignedAt: Date,
     eventTimeStamp: Date
 }

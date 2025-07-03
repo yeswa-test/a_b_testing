@@ -30,7 +30,7 @@ export class UserModel extends BaseMongooseModel {
         return BaseMongooseModel.find().lean();
     }
 
-    static async getUser(userId:string){
+    static async getUser(userId:string):Promise<IUser|null>{
         return BaseMongooseModel.findOne({userId:userId}).lean();
     }
 }

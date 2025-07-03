@@ -5,7 +5,7 @@ services:
     image: mongo:7.0
     container_name: mongodb_a_b_testing
     ports:
-      - "5000:5000"
+      - "5002:27017"
     volumes:
       - mongodb_data:/data/db
 

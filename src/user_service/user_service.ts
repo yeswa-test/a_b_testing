@@ -1,11 +1,11 @@
-import { IUser, UserModel } from "../model/user_model";
-import { MyUtil } from "../my_util";
-import { UserVariantService } from "../user_variant_service/user_variant_service";
+import {IUser, UserModel} from "../model/user_model";
+import {MyUtil} from "../my_util";
+import {Request, Response} from 'express';
+
 
 export class UserService extends UserModel {
 
-
-    static async ioCreateUser(req, res) {
+    static async ioCreateUser(req: Request, res: Response) {
         try {
             let name = req.body.name;
             let email = req.body.email;
@@ -16,15 +16,14 @@ export class UserService extends UserModel {
                 email: email,
                 userId: MyUtil.getMongooseId()
             }
-            await this.assignAndFetchUser(user);
+            await UserService.assignAndFetchUser(user);
             return res.json("User created");
-        }
-        catch (e) {
+        } catch (e) {
             return res.json(`Error in User Creation : ${e}`);
         }
     }
 
     static async assignAndFetchUser(user: IUser) {
-        await this.addOrUpdateUser(user, user);
+        await UserModel.addOrUpdateUser(user, user);
     }
 }
