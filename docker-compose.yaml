@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:7.0
+    container_name: mongodb_a_b_testing
+    ports:
+      - "5000:5000"
+    volumes:
+      - mongodb_data:/data/db
+
+  app:
+    build: .
+    container_name: a_b_testing_app
+    ports:
+      - "5001:5001"
+    depends_on:
+      - mongodb
+    environment:
+      - MONGO_URI=mongodb://mongodb:27017/a_b_testing
+
+volumes:
+  mongodb_data:
